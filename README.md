@@ -1,29 +1,49 @@
-C# Algorithms Project
+# DotNet Sandbox
 =========================================
-[![Build Status](https://travis-ci.org/GarrettWong/CSharp_Algorithms.svg?branch=master)](https://travis-ci.org/GarrettWong/CSharp_Algorithms)
+[![Build Status](https://travis-ci.org/garrettwong/DotNetSandbox.svg?branch=master)](https://travis-ci.org/garrettwong/DotNetSandbox)
 
-C# Algorithms is an algorithm workspace that implements common algorithms.  Primarily developed as a supplement for interview preparation and review.  
+DotNet Sandbox is a set of C# projects that are test automated using Docker and a local version of dotnet.  
 
-## Getting Started with Visual Studio
+## Getting Started
+
+Prerequisites include:
+* VS 2022 Preview edition on MacOSX
+* dotnet 7.0.100-rc.2.22477.23
+
+## Running
+
+In the main solution directory, or a test specific directory (i.e. DotNetSandbox/), run:
+
+```dotnet test```
+
+## Running (Docker)
+
+```docker run --rm -v $(pwd):/app -w /app mcr.microsoft.com/dotnet/sdk:7.0 dotnet test --logger:trx```
+
+```docker run --rm -v $(pwd):/app -w /app/DotNetSandbox mcr.microsoft.com/dotnet/sdk:7.0 dotnet test --logger:trx```
+
+Tests are written in XUnit.
+
+## Docker Builds
+
 ```
-git clone git@github.com:garrettwong/CSharp_Algorithms.git
-cd Algorithms/
-./Algorithms.sln #developed on VS2017
+docker build -f Dockerfiles/Dockerfile.dotnet7.console -t gcr.io/my-project-id/dotnet7console .
+docker images
+docker run  -it --entrypoint /bin/sh 6acb8b2ee7fd
+dockr run -it 6acb8b2ee7fd # these two are equivalent
 ```
-_Tests are written in NUnit.  You will need to install the NUnit Test Runner in Visual Studio._
 
-## Getting Started with .NET Core
+## General Build Pipeline
+
 ```
-git clone git@github.com:garrettwong/CSharp_Algorithms.git
-cd Algorithms/
-
-cd csharpAlgorithms/
+git clone git@github.com:garrettwong/DotNetSandbox.git
+cd DotNetSandbox/
 dotnet restore
 dotnet build
-
-cd ../csharpAlgorithms_Tests
 dotnet test
 ```
+
+## Archives
 
 ### Bytes
 -------------------------
