@@ -1,123 +1,156 @@
 ﻿namespace GLibrary.Sorts;
-public class Introsort : ISort
+/// <summary>
+/// https://github.com/harichinnan/Java-Algorithms/blob/master/Introsort.java
+/// </summary>
+public class Introsort2 : ISort
 {
+    private const int SIZE_THRESHOLD = 16;
+
     public void Sort(int[] arr)
     {
-        IntroSort(ref arr);
+        IntroSortLoop(arr, 0, arr.Length, 2 * FloorLg(arr.Length));
     }
 
-    public void IntroSort(ref int[] data)
+    private void IntroSortLoop(int[] arr, int lo, int hi, int depth_limit)
     {
-        int partitionSize = Partition(ref data, 0, data.Length - 1);
-
-        if (partitionSize < 16)
+        while (hi - lo > SIZE_THRESHOLD)
         {
-            InsertionSort(ref data);
-        }
-        else if (partitionSize > (2 * Math.Log(data.Length)))
-        {
-            HeapSort(ref data);
-        }
-        else
-        {
-            QuickSortRecursive(ref data, 0, data.Length - 1);
-        }
-    }
-
-    private void InsertionSort(ref int[] data)
-    {
-        for (int i = 1; i < data.Length; ++i)
-        {
-            int j = i;
-
-            while ((j > 0))
+            if (depth_limit == 0)
             {
-                if (data[j - 1] > data[j])
-                {
-                    data[j - 1] ^= data[j];
-                    data[j] ^= data[j - 1];
-                    data[j - 1] ^= data[j];
-
-                    --j;
-                }
-                else
-                {
-                    break;
-                }
+                Heapsort(arr, lo, hi);
+                return;
             }
+            depth_limit = depth_limit - 1;
+            int p = Partition(arr, lo, hi,
+                    Medianof3(arr, lo, lo + ((hi - lo) / 2) + 1, hi - 1));
+
+            IntroSortLoop(arr, p, hi, depth_limit);
+            hi = p;
         }
+
+        Insertionsort(arr, lo, hi);
     }
 
-    private void HeapSort(ref int[] data)
+    /*
+     * Quicksort algorithm modified for Introsort
+     */
+    private int Partition(int[] arr, int lo, int hi, int x)
     {
-        int heapSize = data.Length;
-
-        for (int p = (heapSize - 1) / 2; p >= 0; --p)
-            MaxHeapify(ref data, heapSize, p);
-
-        for (int i = data.Length - 1; i > 0; --i)
+        int i = lo, j = hi;
+        while (true)
         {
-            int temp = data[i];
-            data[i] = data[0];
-            data[0] = temp;
-
-            --heapSize;
-            MaxHeapify(ref data, heapSize, 0);
-        }
-    }
-
-    private void MaxHeapify(ref int[] data, int heapSize, int index)
-    {
-        int left = (index + 1) * 2 - 1;
-        int right = (index + 1) * 2;
-        int largest = 0;
-
-        if (left < heapSize && data[left] > data[index])
-            largest = left;
-        else
-            largest = index;
-
-        if (right < heapSize && data[right] > data[largest])
-            largest = right;
-
-        if (largest != index)
-        {
-            int temp = data[index];
-            data[index] = data[largest];
-            data[largest] = temp;
-
-            MaxHeapify(ref data, heapSize, largest);
-        }
-    }
-
-    private void QuickSortRecursive(ref int[] data, int left, int right)
-    {
-        if (left < right)
-        {
-            int q = Partition(ref data, left, right);
-            QuickSortRecursive(ref data, left, q - 1);
-            QuickSortRecursive(ref data, q + 1, right);
-        }
-    }
-
-    private int Partition(ref int[] data, int left, int right)
-    {
-        int pivot = data[right];
-        int i = left;
-
-        for (int j = left; j < right; ++j)
-        {
-            if (data[j] <= pivot)
-            {
-                SortUtils.Swap(data, i, j);
-
+            while (arr[i].CompareTo(x) < 0)
                 i++;
+            j = j - 1;
+            while (x.CompareTo(arr[j]) < 0)
+                j = j - 1;
+            if (!(i < j))
+                return i;
+
+            Exchange(arr, i, j);
+            i++;
+        }
+    }
+
+    private int Medianof3(int[] arr, int lo, int mid, int hi)
+    {
+        if (arr[mid].CompareTo(arr[lo]) < 0)
+        {
+            if (arr[hi].CompareTo(arr[mid]) < 0)
+            {
+                return arr[mid];
+            }
+            else
+            {
+                if (arr[hi].CompareTo(arr[lo]) < 0)
+                    return arr[hi];
+                else
+                    return arr[lo];
             }
         }
+        else
+        {
+            if (arr[hi].CompareTo(arr[mid]) < 0)
+            {
+                if (arr[hi].CompareTo(arr[lo]) < 0)
+                    return arr[lo];
+                else
+                    return arr[hi];
+            }
+            else
+                return arr[mid];
+        }
+    }
 
-        data[right] = data[i];
-        data[i] = pivot;
+    /*
+     * Heapsort algorithm
+     */
+    private void Heapsort(int[] arr, int lo, int hi)
+    {
+        int n = hi - lo;
+        for (int i = n / 2; i >= 1; i = i - 1)
+        {
+            Downheap(arr, i, n, lo);
+        }
+        for (int i = n; i > 1; i = i - 1)
+        {
+            Exchange(arr, lo, lo + i - 1);
+            Downheap(arr, 1, i - 1, lo);
+        }
+    }
 
-        return i;
+    private void Downheap(int[] arr, int i, int n, int lo)
+    {
+        int d = arr[lo + i - 1];
+        int child;
+        while (i <= n / 2)
+        {
+            child = 2 * i;
+            if (child < n && (arr[lo + child - 1].CompareTo(arr[lo + child]) < 0))
+            {
+                child++;
+            }
+            if (d.CompareTo(arr[lo + child - 1]) >= 0)
+                break;
+            arr[lo + i - 1] = arr[lo + child - 1];
+            i = child;
+        }
+
+        arr[lo + i - 1] = d;
+    }
+
+    /*
+     * Insertion sort algorithm
+     */
+    private void Insertionsort(int[] arr, int lo, int hi)
+    {
+        int i, j;
+        int t;
+        for (i = lo; i < hi; i++)
+        {
+            j = i;
+            t = arr[i];
+            while (j != lo && t.CompareTo(arr[j - 1]) < 0)
+            {
+                arr[j] = arr[j - 1];
+                j--;
+            }
+            arr[j] = t;
+        }
+    }
+
+    /*
+     * Common methods for all algorithms
+     */
+    private void Exchange(int[] arr, int i, int j)
+    {
+        int t = arr[i];
+        arr[i] = arr[j];
+        arr[j] = t;
+    }
+
+    private int FloorLg(int a)
+    {
+        return (int)(Math.Floor(Math.Log(a) / Math.Log(2)));
     }
 }
