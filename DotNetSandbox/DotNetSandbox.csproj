@@ -23,8 +23,13 @@
 
   <ItemGroup>
     <None Remove="Algorithms\" />
+    <None Remove="Sorts\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Algorithms\" />
+    <Folder Include="Sorts\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GLibrary\GLibrary.csproj" />
   </ItemGroup>
 </Project>
