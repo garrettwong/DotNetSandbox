@@ -67,10 +67,6 @@ dotnet test
 
 ### Dynamic Programming
 -------------------------
-- Fibonacci Sequence
-
-### Dynamic Programming
--------------------------
 - The concept of memoization and use of an external "cache" to memoize steps to compute step by step towards the final goal
 - Fibonacci Sequence
 
