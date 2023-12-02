@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-latest
     env:
       working-directory: ./AdventOfCode2023
+    defaults:
+      run:
+        working-directory: ${{ env.working-directory }}
     steps:
       - uses: actions/checkout@master
       - name: Run Snyk to check for vulnerabilities
@@ -29,12 +32,10 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --sarif-file-output=snyk.sarif
-        working-directory: ${{env.working-directory}}
       - name: Upload result to GitHub Code Scanning
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: snyk.sarif
-        working-directory: ${{env.working-directory}}
   # snyk:
   #   permissions:
   #     contents: read # for actions/checkout to fetch code
