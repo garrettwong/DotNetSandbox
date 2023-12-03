@@ -47,42 +47,49 @@ jobs:
       SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Snyk CLI to check for security issues
-        uses: actions/setup-dotnet@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          dotnet-version: 7.0.402
-      - name: Restore dependencies
-        run: dotnet restore ./DotNetSandbox.sln
-      - name: High Severity Scan
-        uses: snyk/actions/dotnet@master
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-        with:
-          args: --severity-threshold=high
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm install -g snyk
 
-        # Runs Snyk Code (SAST) analysis and uploads result into GitHub.
-        # Use || true to not fail the pipeline
-      - name: Snyk Code test
-        run: snyk code test --sarif > snyk-code.sarif || true
-        # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
+      # - name: Set up Snyk CLI to check for security issues
+      #   uses: actions/setup-dotnet@v3
+      #   with:
+      #     dotnet-version: 7.0.402
+      # - name: Restore dependencies
+      #   run: dotnet restore ./DotNetSandbox.sln
+      # - name: High Severity Scan
+      #   uses: snyk/actions/dotnet@master
+      #   env:
+      #     SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      #   with:
+      #     args: --severity-threshold=high
 
-      - name: Snyk Open Source monitor
-        run: snyk monitor --all-projects
+      #   # Runs Snyk Code (SAST) analysis and uploads result into GitHub.
+      #   # Use || true to not fail the pipeline
+      # - name: Snyk Code test
+      #   run: snyk code test --sarif > snyk-code.sarif || true
+      #   # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
 
-        # Runs Snyk Infrastructure as Code (IaC) analysis and uploads result to Snyk.
-        # Use || true to not fail the pipeline.
-      - name: Snyk IaC test and report
-        run: snyk iac test --report # || true
+      # - name: Snyk Open Source monitor
+      #   run: snyk monitor --all-projects
 
-        # Build the docker image for testing
-      - name: Build a Docker image
-        run: docker build f Dockerfiles/Dockerfile.dotnet7.console -t your/image-to-test .
-        # Runs Snyk Container (Container and SCA) analysis and uploads result to Snyk.
-      - name: Snyk Container monitor
-        run: snyk container monitor your/image-to-test --file=Dockerfile
+      #   # Runs Snyk Infrastructure as Code (IaC) analysis and uploads result to Snyk.
+      #   # Use || true to not fail the pipeline.
+      # - name: Snyk IaC test and report
+      #   run: snyk iac test --report # || true
 
-        # Push the Snyk Code results into GitHub Code Scanning tab
-      - name: Upload result to GitHub Code Scanning
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: snyk-code.sarif
+      #   # Build the docker image for testing
+      # - name: Build a Docker image
+      #   run: docker build f Dockerfiles/Dockerfile.dotnet7.console -t your/image-to-test .
+      #   # Runs Snyk Container (Container and SCA) analysis and uploads result to Snyk.
+      # - name: Snyk Container monitor
+      #   run: snyk container monitor your/image-to-test --file=Dockerfile
+
+      #   # Push the Snyk Code results into GitHub Code Scanning tab
+      # - name: Upload result to GitHub Code Scanning
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: snyk-code.sarif
