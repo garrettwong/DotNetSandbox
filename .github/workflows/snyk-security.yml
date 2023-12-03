@@ -51,18 +51,20 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.0.402
-
-      - name: Run Snyk to check for vulnerabilities
+      - name: Restore dependencies
+        run: dotnet restore ./DotNetSandbox.sln
         uses: snyk/actions/dotnet@master
-        continue-on-error: true # To make sure that SARIF upload gets called
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --sarif-file-output=snyk.sarif
-          
+          args: --severity-threshold=high
+
         # Runs Snyk Code (SAST) analysis and uploads result into GitHub.
         # Use || true to not fail the pipeline
       - name: Snyk Code test
         run: snyk code test --sarif > snyk-code.sarif || true
         # Runs Snyk Open Source (SCA) analysis and uploads result to Snyk.
+
       - name: Snyk Open Source monitor
         run: snyk monitor --all-projects
 
