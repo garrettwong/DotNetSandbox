@@ -53,6 +53,7 @@ jobs:
           dotnet-version: 7.0.402
       - name: Restore dependencies
         run: dotnet restore ./DotNetSandbox.sln
+      - name: High Severity Scan
         uses: snyk/actions/dotnet@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
