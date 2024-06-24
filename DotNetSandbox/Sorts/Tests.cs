@@ -28,6 +28,7 @@ namespace DotNetSandbox.Sorts
             var con = types[6].GetConstructor(Type.EmptyTypes);
             var sut = Activator.CreateInstance(types[6]);
             Assert.NotNull(sut);
+            Console.WriteLine(sut.GetType());
             Assert.Equal(typeof(ImplementsIEnum), sut.GetType());
         }
 

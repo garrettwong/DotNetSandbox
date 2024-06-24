@@ -3,6 +3,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.DirectoryServices;
 using System.Text.RegularExpressions;
+using Microsoft.VisualBasic;
 using DirectoryEntry = System.DirectoryServices.DirectoryEntry;
 
 internal class Program
@@ -12,12 +13,16 @@ internal class Program
         // Day1Part1.Run(args);
         Day1Part2.Run(args);
 
+        Day2Part1.Run(args);
+
         var q = HasNumberEmbedded(args[0]);
         Console.WriteLine(q);
         var sqlDataReader = NotSoSecureQuery(args[0]);
         Console.WriteLine(sqlDataReader);
-        LdapInjedtion(args[0]);
+        LdapInjection(args[0]);
         CommandInjection(args[0]);
+        PathTraversal("/Users/v01k23nladf/", ".ssh/id_rsa");
+        PathTraversal("/Users/v01k23nladf/", args[0]);
     }
 
     public static IDataReader NotSoSecureQuery(string sql)
@@ -36,7 +41,7 @@ internal class Program
         return System.Text.RegularExpressions.Regex.Match(inputToTest, REGEX);
     }
 
-    public static void LdapInjedtion(string searchString) {
+    public static void LdapInjection(string searchString) {
         DirectoryEntry rootEntry = new DirectoryEntry("LDAP://some.ldap.server.com");
         rootEntry.AuthenticationType = AuthenticationTypes.None; //Or whatever it need be
         DirectorySearcher searcher = new DirectorySearcher(rootEntry);
@@ -54,5 +59,12 @@ internal class Program
         ProcessStartInfo info = new ProcessStartInfo("CMD.exe", strCmdText);
         Process.Start(info);
     }
-}
 
+    public static void PathTraversal(string dirName, string x) {
+        string ROOT = @"/";
+
+        var downloadDirectory = Path.Combine(ROOT, dirName);
+        var dest = Path.Combine(dirName, x);
+        Console.WriteLine(File.ReadAllText(dest));
+    }
+}
